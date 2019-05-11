@@ -8,15 +8,14 @@ def main():
     file = pd.read_csv('30666517-2019-05-11.csv', ';')
     # file = file.dropna(axis='index', how='any', subset=['text'])
 
-
     date = file['date']
     day = file['weekday']
     time = file['time']
     likes = file['likes']
     reposts = file['reposts']
     views = file['views']
-    text = file[['text']]
-    link = file[['link']]
+    text = file['text']
+    link = file['link']
 
     # определяем среднии значения
     max_laik = file['likes'].describe()
