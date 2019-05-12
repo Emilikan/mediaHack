@@ -6,16 +6,40 @@ from sklearn.svm import SVR
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import r2_score
 from sklearn.model_selection import train_test_split
+from sklearn import svm
+from sklearn import datasets
+from sklearn.externals import joblib
+import pickle
+import pandas as pd
 
 import numpy as np
 from pylab import *
 
-path = 'EnergyEfficiency/ENB2012_data.csv'
+path = '0-2019-05-12(new).csv'
+
+def newF():
+    dataset = read_csv(path, ';')
+    dataset.head()
+
+    trg = dataset[['class']]
+    trn = dataset.drop(['class'], axis=1)
+
+    # разобьем данные на тестовую и обучающую выборку
+
+    Xtrn, Xtest, Ytrn, Ytest = train_test_split(trn, trg, test_size=0.4)
+
+    clf = LogisticRegression(random_state=0, solver='lbfgs', multi_class='multinomial').fit(Xtrn, ravel(Ytrn))
+
+    # сохранение модели
+    joblib.dump(clf, 'filename.pkl')
 
 
 def main():
     dataset = read_csv(path, ';')
     dataset.head()
+
+    trg = dataset[['class']]
+    trn = dataset.drop(['class'], axis=1)
 
     models = [LinearRegression(),  # метод наименьших квадратов
               RandomForestRegressor(n_estimators=100, max_features='sqrt'),  # случайный лес
@@ -26,8 +50,53 @@ def main():
 
     # разобьем данные на тестовую и обучающую выборку
 
+    Xtrn, Xtest, Ytrn, Ytest = train_test_split(trn, trg, test_size=0.4)
+
+    # создаем временные структуры
+    TestModels = DataFrame()
+    tmp = {}
+    print('f')
+    # для каждой модели из списка
+    for model in models:
+        # получаем имя модели
+        m = str(model)
+        tmp['Model'] = m[:m.index('(')]
+
+        model.fit(Xtrn, ravel(Ytrn))
+        tmp['R2_Y%s' % str(Ytrn.shape[1] + 1)] = r2_score(Ytest, model.predict(Xtest))
+        # для каждого столбцам результирующего набора
+
+        # записываем данные и итоговый DataFrame
+        TestModels = TestModels.append([tmp])
+    # делаем индекс по названию модели
+    TestModels.set_index('Model', inplace=True)
+
+    print('t')
+
+    # отрисовка
+    fig, axes = plt.subplots(ncols=2, figsize=(10, 4))
+    TestModels.R2_Y1.plot(ax=axes[0], kind='bar', title='R2_Y1')
+    TestModels.R2_Y2.plot(ax=axes[1], kind='bar', color='green', title='R2_Y2')
+
+
+
+def mt():
+    file = pd.read_csv('0-2019-05-11.csv', ';')
+    Y = file['class']
+    X = file[['holiday', 'weekends', 'time']]
+
+    file2 = pd.read_csv('0-2019-05-12.csv', ';')
+    Y1 = file2['class']
+    X1 = file2[['holiday', 'weekends', 'time']]
+
+    clf = LogisticRegression(random_state=0, solver='lbfgs', multi_class='multinomial').fit(X, Y)
+    print(clf.score(X1, Y1))
+
+
 
 def log_regr():
+
+
     # Для вопроизодимости результатов, зависящих от генератора случайных чисел
     np.random.seed(1000)
 
@@ -90,3 +159,5 @@ def log_regr():
     gca().set_ylim([y_min, y_max])
 
     show()
+
+newF()

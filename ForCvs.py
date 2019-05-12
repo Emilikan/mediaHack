@@ -8,15 +8,14 @@ def main():
     file = pd.read_csv('30666517-2019-05-11.csv', ';')
     # file = file.dropna(axis='index', how='any', subset=['text'])
 
-
     date = file['date']
     day = file['weekday']
     time = file['time']
     likes = file['likes']
     reposts = file['reposts']
     views = file['views']
-    text = file[['text']]
-    link = file[['link']]
+    text = file['text']
+    link = file['link']
 
     # определяем среднии значения
     max_laik = file['likes'].describe()
@@ -52,9 +51,9 @@ def main():
 
 
 def one(likes, reposts, views, mean_likes, mean_reposts, mean_views):
-    if ((likes > mean_likes and reposts > mean_reposts) or (likes > mean_likes and views > mean_views)
-            or (reposts > mean_reposts and views > mean_views)
-            or (likes > mean_likes and reposts > mean_reposts and views > mean_views)):
+    if ((likes > mean_likes and reposts > mean_reposts) | (likes > mean_likes and views > mean_views)
+            | (reposts > mean_reposts and views > mean_views)
+            | (likes > mean_likes and reposts > mean_reposts and views > mean_views)):
         return 1
     else:
         return 0
@@ -95,9 +94,9 @@ def dateF(date):
 
 def write_csv(data, encoding='utf-8'):
     owner_id = data[0]['id']
-    filename = '{owner_id}-{datetime}.csv'.format(owner_id=owner_id, datetime=str(datetime.datetime.now())[:10])
+    filename = '{owner_id}-{datetime}(new).csv'.format(owner_id=owner_id, datetime=str(datetime.datetime.now())[:10])
     with open(filename, 'w', newline='', encoding=encoding) as csvfile:
-        fieldnames = ['id', 'class', 'holiday', 'weekends', 'time']
+        fieldnames = ['class', 'holiday', 'weekends', 'time']
 
         writer = csv.DictWriter(csvfile, delimiter=';', fieldnames=fieldnames, extrasaction='ignore')
         writer.writeheader()
@@ -107,4 +106,22 @@ def write_csv(data, encoding='utf-8'):
     csvfile.close()
 
 
+def test():
+    file = pd.read_csv('0-2019-05-11.csv', ';')
+    file2 = pd.read_csv('0-2019-05-12.csv', ';')
+
+    c1 = 0
+    for i in file['class']:
+        if i == 1:
+            c1+=1
+
+    c2 = 0
+    for i in file2['class']:
+        if i == 1:
+            c2+=1
+
+    print('file1', c1)
+    print('file2', c2)
+
 main()
+
