@@ -1,5 +1,4 @@
 #!/home/emilka/PycharmProjects/mediaHack/venv/bin/python
-
 # -*- coding: utf-8 -*-
 import re
 import sys
